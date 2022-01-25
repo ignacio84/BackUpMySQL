@@ -2,18 +2,11 @@ package com.gff.view;
 
 import static com.gff.util.Enviroment.*;
 import com.gff.view.gui.*;
-import com.toedter.calendar.JDateChooser;
-import java.awt.Color;
-import javafx.scene.control.ScrollBar;
 import javax.swing.ButtonGroup;
+import javax.swing.JFileChooser;
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
-import javax.swing.text.StyledDocument;
 
 public class BackUpView extends Frame {
 
@@ -28,12 +21,14 @@ public class BackUpView extends Frame {
 
     private Label lblDump;
     private TextField txtDump;
+    private FileChooser fchDump;
 
     private Label lblSave;
     private TextField txtSave;
+    private JFileChooser fchSave;
 
     private Label lblStartDate;
-    private JDateChooser dateChooserStart;
+    private DateChooser dateChooserStart;
 
     private Label lblScheduling;
     private RadioButton rdbScheOnce;
@@ -53,6 +48,8 @@ public class BackUpView extends Frame {
     }
 
     private void initComponents() {
+        this.fchDump = new FileChooser("exe", JFileChooser.FILES_ONLY, false, false, true, true);
+        this.fchSave = new FileChooser("sql", JFileChooser.DIRECTORIES_ONLY, false, false, true, true);
 
         this.lblNameBD = new Label("Nombre BD : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 15, 130, 35);
         this.txtNameBD = new TextField(SwingConstants.CENTER, FONT_BOLD_14, this, 150, 15, 215, 35);
@@ -64,10 +61,10 @@ public class BackUpView extends Frame {
         this.txtPass = new PasswordField(SwingConstants.CENTER, this, 150, 115, 215, 35);
 
         this.lblDump = new Label("MySQLDump.exe : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 165, 130, 35);
-        this.txtDump = new TextField(SwingConstants.CENTER, FONT_BOLD_14, this, 150, 165, 215, 35);
+        this.txtDump = new TextField(SwingConstants.CENTER, FONT_BOLD_14, false, this, 150, 165, 215, 35);
 
         this.lblSave = new Label("Guardar en : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 215, 130, 35);
-        this.txtSave = new TextField(SwingConstants.CENTER, FONT_BOLD_14, this, 150, 215, 215, 35);
+        this.txtSave = new TextField(SwingConstants.CENTER, FONT_BOLD_14, false, this, 150, 215, 215, 35);
 
         this.lblSave = new Label("Fecha Inicio : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 265, 130, 35);
         this.dateChooserStart = new DateChooser(SwingConstants.CENTER, FONT_BOLD_14, this, 150, 265, 215, 35);
@@ -88,5 +85,21 @@ public class BackUpView extends Frame {
         this.btnStart = new Button("Iniciar", SwingConstants.CENTER, FONT_BOLD_14, this, 20, 620, 170, 35);
         this.btnStop = new Button("Detener", SwingConstants.CENTER, FONT_BOLD_14, this, 197, 620, 174, 35);
 
+    }
+
+    public TextField getTxtDump() {
+        return txtDump;
+    }
+
+    public JFileChooser getFchDump() {
+        return fchDump;
+    }
+
+    public TextField getTxtSave() {
+        return txtSave;
+    }
+
+    public JFileChooser getFchSave() {
+        return fchSave;
     }
 }
