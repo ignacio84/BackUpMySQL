@@ -13,9 +13,11 @@ public interface Enviroment {
     public static final String PATH_IMG = "/img/";
 
     public static final String PATH_FONTS = "/fonts/";
-    
-    public static final String APP_TITLE_FONT = "Cairo Light BOLD 15";
-    
+
+    public static final String APP_TITLE_FONT = APP_FONT + " BOLD 15";
+
+    public static final String DIALOG_FONT = APP_FONT + " BOLD 13";
+
     public static final Font FONT_PLAIN_11 = new Font(APP_FONT, Font.PLAIN, 11);
 
     public static final Font FONT_PLAIN_12 = new Font(APP_FONT, Font.PLAIN, 12);
@@ -59,7 +61,7 @@ public interface Enviroment {
     public static final Font FONT_BOLD_35 = new Font(APP_FONT, Font.BOLD, 35);
 
     public static final Font FONT_BOLD_40 = new Font(APP_FONT, Font.BOLD, 40);
-    
+
     public static final Font FONT_BOLD_50 = new Font(APP_FONT, Font.BOLD, 50);
 
 }

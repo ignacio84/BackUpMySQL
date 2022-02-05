@@ -1,22 +1,32 @@
 package com.gff.controller;
 
+import com.gff.model.entity.Configuracion;
 import com.gff.util.WindowsSystemTray;
 import com.gff.view.BackUpView;
 import java.awt.Frame;
 import java.awt.TrayIcon;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Date;
+import java.time.ZoneId;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
-public class BackUpController implements WindowStateListener, MouseListener {
+public class BackUpController implements WindowStateListener, MouseListener, ActionListener {
 
     private BackUpView vBackUp;
     private WindowsSystemTray tray;
+
+    private final String E_SERVER = "Favor de ingresar la dirección del servidor.";
+    private final String E_NAME_DB = "Favor de ingresar nombre de BD.";
+    private final String E_USER_DB = "Favor de ingresar usuario de BD.";
+    private final String E_PASS_DB = "Favor de ingresar contraseña de BD.";
+    private final String E_DUMP_PATH = "Favor de seleccionar mysql dump.";
+    private final String E_SAVE_PATH = "Favor de seleccionar directorio.";
+    private final String E_DATE_START = "Favor de seleccionar fecha de inicio.";
 
     public BackUpController() {
         this.vBackUp = new BackUpView("BackUpMySQL", 400, 700);
@@ -30,8 +40,10 @@ public class BackUpController implements WindowStateListener, MouseListener {
 
     private void addListeners() {
         this.vBackUp.addWindowStateListener(this);
-        this.vBackUp.getTxtDump().addMouseListener(this);
-        this.vBackUp.getTxtSave().addMouseListener(this);
+        this.vBackUp.getTxtDumpPath().addMouseListener(this);
+        this.vBackUp.getTxtSavePath().addMouseListener(this);
+        this.vBackUp.getBtnStart().addActionListener(this);
+        this.vBackUp.getBtnStop().addActionListener(this);
     }
 
     @Override
@@ -46,16 +58,16 @@ public class BackUpController implements WindowStateListener, MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (e.getSource().equals(vBackUp.getTxtDump())) {
-            if (vBackUp.getFchDump().showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                this.vBackUp.getTxtDump().setText(vBackUp.getFchDump().getSelectedFile().getAbsolutePath());
+        if (e.getSource().equals(vBackUp.getTxtDumpPath())) {
+            if (vBackUp.getFchDumpPath().showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                this.vBackUp.getTxtDumpPath().setText(vBackUp.getFchDumpPath().getSelectedFile().getAbsolutePath());
 //                vBackUp.getFchDump().setSelectedFile(new File(""));
             }
             return;
         }
-         if (vBackUp.getFchSave().showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-                this.vBackUp.getTxtSave().setText(vBackUp.getFchSave().getSelectedFile().getAbsolutePath());
-            }
+        if (vBackUp.getFchSavePath().showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+            this.vBackUp.getTxtSavePath().setText(vBackUp.getFchSavePath().getSelectedFile().getAbsolutePath());
+        }
     }
 
     @Override
@@ -72,6 +84,53 @@ public class BackUpController implements WindowStateListener, MouseListener {
 
     @Override
     public void mouseExited(MouseEvent e) {
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource().equals(vBackUp.getBtnStart())) {
+            this.start();
+        }
+    }
+
+    private void start() {
+        Configuracion config;
+        if (this.vBackUp.getTxtServerAdress().getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this.vBackUp, E_SERVER, "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (this.vBackUp.getTxtNameBD().getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this.vBackUp, E_NAME_DB, "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (this.vBackUp.getTxtUserBD().getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this.vBackUp, E_USER_DB, "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (this.vBackUp.getPwdPassBD().getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this.vBackUp, E_PASS_DB, "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (this.vBackUp.getTxtDumpPath().getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this.vBackUp, E_DUMP_PATH, "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (this.vBackUp.getTxtSavePath().getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this.vBackUp, E_SAVE_PATH, "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        config = new Configuracion();
+        config.setServerAdress(this.vBackUp.getTxtServerAdress().getText().trim());
+        config.setNameBD(this.vBackUp.getTxtNameBD().getText().trim());
+        config.setUserBD(this.vBackUp.getTxtUserBD().getText().trim());
+        config.setPasswordBD(this.vBackUp.getPwdPassBD().getText().trim());
+        config.setMysqlDump(this.vBackUp.getTxtDumpPath().getText().trim());
+        config.setSavePath(this.vBackUp.getTxtSavePath().getText().trim());
+        config.setStartDate(this.vBackUp.getDateChooserStartDate().getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        config.setScheduling(this.vBackUp.getBtgScheduling().getSelection().getActionCommand());
+        System.out.println(config.toString());
     }
 
 }

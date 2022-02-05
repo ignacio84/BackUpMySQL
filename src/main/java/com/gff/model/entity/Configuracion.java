@@ -1,15 +1,17 @@
 package com.gff.model.entity;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class Configuracion {
 
+    private String serverAdress;
     private String nameBD;
     private String userBD;
     private String passwordBD;
     private String mysqlDump;
     private String savePath;
-    private Date startDate;
+    private LocalDate startDate;
     private String scheduling;
 
     public String getNameBD() {
@@ -51,12 +53,12 @@ public class Configuracion {
     public void setSavePath(String savePath) {
         this.savePath = savePath;
     }
-    
-    public Date getStartDate() {
+
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
@@ -68,4 +70,16 @@ public class Configuracion {
         this.scheduling = scheduling;
     }
 
+    public String getServerAdress() {
+        return serverAdress;
+    }
+
+    public void setServerAdress(String serverAdress) {
+        this.serverAdress = serverAdress;
+    }
+
+    @Override
+    public String toString() {
+        return "Configuracion{" + "serverAdress=" + serverAdress + ", nameBD=" + nameBD + ", userBD=" + userBD + ", passwordBD=" + passwordBD + ", mysqlDump=" + mysqlDump + ", savePath=" + savePath + ", startDate=" + startDate + ", scheduling=" + scheduling + '}';
+    }
 }

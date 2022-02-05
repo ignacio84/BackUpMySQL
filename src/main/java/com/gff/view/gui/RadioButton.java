@@ -38,6 +38,18 @@ public class RadioButton extends JRadioButton implements MouseMotionListener {
         this.initComponents();
     }
 
+    public RadioButton(String string, ButtonGroup btnGroup, Integer align, JFrame frame, Integer x, Integer y, Integer w, Integer h) {
+        super(string);
+        this.font = font;
+        this.frame = frame;
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.btnGroup = btnGroup;
+        this.initComponents();
+    }
+
     public RadioButton(String string, String valueActionCommand, ButtonGroup btnGroup) {
         super(string);
         this.btnGroup = btnGroup;

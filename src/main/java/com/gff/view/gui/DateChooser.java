@@ -29,6 +29,17 @@ public class DateChooser extends JDateChooser {
         this.initComponents();
     }
 
+    public DateChooser(Integer align, JFrame frame, Integer x, Integer y, Integer w, Integer h) {
+        this.align = align;
+        this.font = font;
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.frame = frame;
+        this.initComponents();
+    }
+
     private void initComponents() {
         this.dateFormat = "yyyy-MM-dd";
         if (this.frame != null) {

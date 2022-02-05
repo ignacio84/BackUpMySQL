@@ -10,7 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 public class TextField extends JTextField {
-    
+
     private Integer x;
     private Integer y;
     private Integer w;
@@ -20,7 +20,7 @@ public class TextField extends JTextField {
     private JDialog dialog;
     private Font font;
     private Boolean editable;
-    
+
     public TextField(Integer align, Color fontColor, Font font, JDialog dialog, Integer x, Integer y, Integer w, Integer h) {
         this.setHorizontalAlignment(align);
         this.x = x;
@@ -32,7 +32,7 @@ public class TextField extends JTextField {
         this.setForeground(fontColor);
         this.initComponents();
     }
-    
+
     public TextField(Integer align, JDialog dialog, Integer x, Integer y, Integer w, Integer h) {
         this.setHorizontalAlignment(align);
         this.x = x;
@@ -42,7 +42,7 @@ public class TextField extends JTextField {
         this.dialog = dialog;
         this.initComponents();
     }
-    
+
     public TextField(Integer align, JFrame frame, Integer x, Integer y, Integer w, Integer h) {
         this.setHorizontalAlignment(align);
         this.x = x;
@@ -52,7 +52,7 @@ public class TextField extends JTextField {
         this.frame = frame;
         this.initComponents();
     }
-    
+
     public TextField(Integer align, Font font, JFrame frame, Integer x, Integer y, Integer w, Integer h) {
         this.setHorizontalAlignment(align);
         this.x = x;
@@ -63,7 +63,7 @@ public class TextField extends JTextField {
         this.font = font;
         this.initComponents();
     }
-    
+
     public TextField(Integer align, Font font, Boolean editable, JFrame frame, Integer x, Integer y, Integer w, Integer h) {
         this.setHorizontalAlignment(align);
         this.x = x;
@@ -75,7 +75,19 @@ public class TextField extends JTextField {
         this.editable = editable;
         this.initComponents();
     }
-    
+
+    public TextField(Integer align, Boolean editable, JFrame frame, Integer x, Integer y, Integer w, Integer h) {
+        this.setHorizontalAlignment(align);
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.frame = frame;
+        this.font = font;
+        this.editable = editable;
+        this.initComponents();
+    }
+
     private void initComponents() {
         if (this.frame != null) {
             this.frame.add(this);
@@ -95,13 +107,13 @@ public class TextField extends JTextField {
         this.setBounds(x, y, w, h);
         this.addListeners();
     }
-    
+
     private void addListeners() {
         this.addMouseMotionListener(new MouseMotionListener() {
             @Override
             public void mouseDragged(MouseEvent e) {
             }
-            
+
             @Override
             public void mouseMoved(MouseEvent e) {
                 ((JTextField) e.getSource()).setCursor(new Cursor(Cursor.HAND_CURSOR));

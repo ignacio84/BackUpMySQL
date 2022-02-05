@@ -20,9 +20,11 @@ public class ThemePropierties {
         props.put("systemTextFont", APP_FONT);
         props.put("controlTextFont", APP_FONT);
         props.put("menuTextFont", APP_FONT);
-        props.put("userTextFont", APP_FONT);
+        props.put("userTextFont", DIALOG_FONT);
         props.put("subTextFont", APP_FONT);
         props.put("windowTitleFont", APP_TITLE_FONT);
+
+        //  APP_FONT + " BOLD 13"
         //             props.put("logoString", "my company"); 
 //            props.put("licenseKey", "INSERT YOUR LICENSE KEY HERE");
 //            props.put("selectionBackgroundColor", "180 240 197"); 
@@ -41,7 +43,6 @@ public class ThemePropierties {
 //            props.put("windowTitleColorLight", "218 254 230"); 
 //            props.put("windowTitleColorDark", "180 240 197"); 
 //            props.put("windowBorderColor", "218 254 230");
-
         return props;
     }
 
