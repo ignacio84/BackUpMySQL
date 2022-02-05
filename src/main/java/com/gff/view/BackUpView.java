@@ -10,6 +10,12 @@ import javax.swing.text.StyleConstants;
 
 public class BackUpView extends Frame {
 
+    private final String PATH_DUMP = "C:\\Program Files\\MySQL\\";
+    private final String FILE_NAME = "mysqldump.exe";
+
+    private Label lblServerAdress;
+    private TextField txtServerAdress;
+
     private Label lblNameBD;
     private TextField txtNameBD;
 
@@ -48,38 +54,41 @@ public class BackUpView extends Frame {
     }
 
     private void initComponents() {
-        this.fchDump = new FileChooser("exe", JFileChooser.FILES_ONLY, false, false, true, true);
+        this.fchDump = new FileChooser(JFileChooser.FILES_ONLY, PATH_DUMP, FILE_NAME, false, false, true, true);
         this.fchSave = new FileChooser("sql", JFileChooser.DIRECTORIES_ONLY, false, false, true, true);
 
-        this.lblNameBD = new Label("Nombre BD : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 15, 130, 35);
-        this.txtNameBD = new TextField(SwingConstants.CENTER, FONT_BOLD_14, this, 150, 15, 215, 35);
+        this.lblServerAdress = new Label("Dirección IP : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 15, 130, 35);
+        this.txtServerAdress = new TextField(SwingConstants.CENTER, FONT_BOLD_14, this, 150, 15, 215, 35);
 
-        this.lblUser = new Label("Usuario BD : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 65, 130, 35);
-        this.txtUser = new TextField(SwingConstants.CENTER, FONT_BOLD_14, this, 150, 65, 215, 35);
+        this.lblNameBD = new Label("Nombre BD : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 65, 130, 35);
+        this.txtNameBD = new TextField(SwingConstants.CENTER, FONT_BOLD_14, this, 150, 65, 215, 35);
 
-        this.lblPass = new Label("Password BD : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 115, 130, 35);
-        this.txtPass = new PasswordField(SwingConstants.CENTER, this, 150, 115, 215, 35);
+        this.lblUser = new Label("Usuario BD : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 115, 130, 35);
+        this.txtUser = new TextField(SwingConstants.CENTER, FONT_BOLD_14, this, 150, 115, 215, 35);
 
-        this.lblDump = new Label("MySQLDump.exe : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 165, 130, 35);
-        this.txtDump = new TextField(SwingConstants.CENTER, FONT_BOLD_14, false, this, 150, 165, 215, 35);
+        this.lblPass = new Label("Password BD : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 165, 130, 35);
+        this.txtPass = new PasswordField(SwingConstants.CENTER, this, 150, 165, 215, 35);
 
-        this.lblSave = new Label("Guardar en : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 215, 130, 35);
-        this.txtSave = new TextField(SwingConstants.CENTER, FONT_BOLD_14, false, this, 150, 215, 215, 35);
+        this.lblDump = new Label("MySQLDump.exe : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 215, 130, 35);
+        this.txtDump = new TextField(SwingConstants.CENTER, FONT_BOLD_14, false, this, 150, 215, 215, 35);
 
-        this.lblSave = new Label("Fecha Inicio : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 265, 130, 35);
-        this.dateChooserStart = new DateChooser(SwingConstants.CENTER, FONT_BOLD_14, this, 150, 265, 215, 35);
+        this.lblSave = new Label("Guardar en : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 265, 130, 35);
+        this.txtSave = new TextField(SwingConstants.CENTER, FONT_BOLD_14, false, this, 150, 265, 215, 35);
 
-        this.lblScheduling = new Label("Planificación : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 315, 130, 35);
+        this.lblSave = new Label("Fecha Inicio : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 315, 130, 35);
+        this.dateChooserStart = new DateChooser(SwingConstants.CENTER, FONT_BOLD_14, this, 150, 315, 215, 35);
+
+        this.lblScheduling = new Label("Planificación : ", SwingConstants.RIGHT, FONT_BOLD_14, this, 15, 365, 130, 35);
         this.btgScheduling = new ButtonGroup();
-        this.rdbScheOnce = new RadioButton("Una vez", btgScheduling, SwingConstants.RIGHT, FONT_BOLD_14, this, 150, 315, 85, 35);
-        this.rdbScheDaily = new RadioButton("Diario", btgScheduling, HEIGHT, FONT_BOLD_14, this, 235, 315, 70, 35);
-        this.rdbScheMonthly = new RadioButton("Mensual", btgScheduling, HEIGHT, FONT_BOLD_14, this, 301, 315, 100, 35);
+        this.rdbScheOnce = new RadioButton("Una vez", btgScheduling, SwingConstants.RIGHT, FONT_BOLD_14, this, 150, 365, 85, 35);
+        this.rdbScheDaily = new RadioButton("Diario", btgScheduling, HEIGHT, FONT_BOLD_14, this, 235, 365, 70, 35);
+        this.rdbScheMonthly = new RadioButton("Mensual", btgScheduling, HEIGHT, FONT_BOLD_14, this, 301, 365, 100, 35);
         this.rdbScheDaily.setSelected(true);
 
         this.txpMessage = new TextPane(StyleConstants.ALIGN_CENTER, FONT_PLAIN_15);
         this.scroll = new JScrollPane(this.txpMessage);
         this.add(this.scroll);
-        this.scroll.setBounds(20, 365, 350, 250);
+        this.scroll.setBounds(20, 405, 350, 210);
         this.repaint();
 
         this.btnStart = new Button("Iniciar", SwingConstants.CENTER, FONT_BOLD_14, this, 20, 620, 170, 35);
@@ -101,5 +110,21 @@ public class BackUpView extends Frame {
 
     public JFileChooser getFchSave() {
         return fchSave;
+    }
+
+    public Button getBtnStart() {
+        return btnStart;
+    }
+
+    public Button getBtnStop() {
+        return btnStop;
+    }
+
+    public TextField getTxtServerAdress() {
+        return txtServerAdress;
+    }
+
+    public DateChooser getDateChooserStart() {
+        return dateChooserStart;
     }
 }

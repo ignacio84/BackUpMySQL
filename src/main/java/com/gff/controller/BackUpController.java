@@ -8,6 +8,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Date;
 import javax.swing.JFileChooser;
 
 public class BackUpController implements WindowStateListener, MouseListener {
@@ -17,6 +20,7 @@ public class BackUpController implements WindowStateListener, MouseListener {
 
     public BackUpController() {
         this.vBackUp = new BackUpView("BackUpMySQL", 400, 700);
+//        this.vBackUp.getDateChooserStart().setMinSelectableDate(LocalDate.now().);
         this.tray = new WindowsSystemTray(vBackUp);
 //        this.enableControls();
         this.addListeners();
