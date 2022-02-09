@@ -80,9 +80,9 @@ public class BackUpView extends Frame {
 
         this.lblScheduling = new Label("Planificación : ", SwingConstants.RIGHT, this, 15, 365, 130, 35);
         this.btgScheduling = new ButtonGroup();
-        this.rdbScheOnce = new RadioButton("Una vez", btgScheduling, SwingConstants.RIGHT, this, 150, 365, 85, 35);
-        this.rdbScheDaily = new RadioButton("Diario", btgScheduling, HEIGHT, this, 235, 365, 70, 35);
-        this.rdbScheMonthly = new RadioButton("Mensual", btgScheduling, HEIGHT, this, 301, 365, 100, 35);
+        this.rdbScheOnce = new RadioButton("Una vez", "one", btgScheduling, SwingConstants.RIGHT, this, 150, 365, 85, 35);
+        this.rdbScheDaily = new RadioButton("Diario", "daily", btgScheduling, HEIGHT, this, 235, 365, 70, 35);
+        this.rdbScheMonthly = new RadioButton("Mensual", "montly", btgScheduling, HEIGHT, this, 301, 365, 100, 35);
         this.rdbScheDaily.setSelected(true);
 
         this.txpMessage = new TextPane(StyleConstants.ALIGN_CENTER, FONT_PLAIN_15);

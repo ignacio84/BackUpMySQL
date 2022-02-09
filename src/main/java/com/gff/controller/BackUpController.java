@@ -1,5 +1,6 @@
 package com.gff.controller;
 
+import com.gff.model.datasource.ConexionMySql;
 import com.gff.model.entity.Configuracion;
 import com.gff.util.WindowsSystemTray;
 import com.gff.view.BackUpView;
@@ -11,7 +12,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -19,6 +25,7 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
 
     private BackUpView vBackUp;
     private WindowsSystemTray tray;
+    private ConexionMySql connection;
 
     private final String E_SERVER = "Favor de ingresar la dirección del servidor.";
     private final String E_NAME_DB = "Favor de ingresar nombre de BD.";
@@ -30,10 +37,13 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
 
     public BackUpController() {
         this.vBackUp = new BackUpView("BackUpMySQL", 400, 700);
-//        this.vBackUp.getDateChooserStart().setMinSelectableDate(LocalDate.now().);
+        this.vBackUp.getDateChooserStartDate().setMinSelectableDate(Date.from(LocalDate.now().atStartOfDay()
+                .atZone(ZoneId.systemDefault())
+                .toInstant()));
         this.tray = new WindowsSystemTray(vBackUp);
 //        this.enableControls();
         this.addListeners();
+        this.connection = new ConexionMySql();
         this.vBackUp.setVisible(true);
 
     }
@@ -130,7 +140,20 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
         config.setSavePath(this.vBackUp.getTxtSavePath().getText().trim());
         config.setStartDate(this.vBackUp.getDateChooserStartDate().getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
         config.setScheduling(this.vBackUp.getBtgScheduling().getSelection().getActionCommand());
-        System.out.println(config.toString());
+        this.connection.setConfig(config);
+        this.connection();
+    }
+
+    private void connection() {
+        try {
+            java.sql.Connection conn = this.connection.getConnection();
+            if (conn != null && !conn.isClosed()) {
+                JOptionPane.showMessageDialog(this.vBackUp, "Conexión OK", "Error", JOptionPane.ERROR_MESSAGE);
+                this.connection.close(conn);
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this.vBackUp, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
 }
