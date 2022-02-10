@@ -1,8 +1,6 @@
 package com.gff.model.entity;
 
 import java.time.LocalDate;
-import java.util.Date;
-
 public class Configuracion {
 
     private String serverAdress;
@@ -13,6 +11,7 @@ public class Configuracion {
     private String savePath;
     private LocalDate startDate;
     private String scheduling;
+    private String starTime;
 
     public String getNameBD() {
         return nameBD;
@@ -78,8 +77,16 @@ public class Configuracion {
         this.serverAdress = serverAdress;
     }
 
+    public String getStarTime() {
+        return starTime;
+    }
+
+    public void setStarTime(String starTime) {
+        this.starTime = starTime;
+    }
+
     @Override
     public String toString() {
-        return "Configuracion{" + "serverAdress=" + serverAdress + ", nameBD=" + nameBD + ", userBD=" + userBD + ", passwordBD=" + passwordBD + ", mysqlDump=" + mysqlDump + ", savePath=" + savePath + ", startDate=" + startDate + ", scheduling=" + scheduling + '}';
+        return "Configuracion{" + "serverAdress=" + serverAdress + ", nameBD=" + nameBD + ", userBD=" + userBD + ", passwordBD=" + passwordBD + ", mysqlDump=" + mysqlDump + ", savePath=" + savePath + ", startDate=" + startDate + ", scheduling=" + scheduling + ", starTime=" + starTime + '}';
     }
 }

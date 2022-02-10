@@ -2,10 +2,14 @@ package com.gff.view;
 
 import static com.gff.util.Enviroment.*;
 import com.gff.view.gui.*;
+import java.util.Calendar;
 import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerDateModel;
 import javax.swing.SwingConstants;
+import javax.swing.text.DateFormatter;
 import javax.swing.text.StyleConstants;
 
 public class BackUpView extends Frame {
@@ -35,6 +39,9 @@ public class BackUpView extends Frame {
 
     private Label lblStartDate;
     private DateChooser dateChooserStartDate;
+
+    private Label lblTime;
+    private SpinnerTime sprTime;
 
     private Label lblScheduling;
     private RadioButton rdbScheOnce;
@@ -78,17 +85,20 @@ public class BackUpView extends Frame {
         this.lblSavePath = new Label("Fecha Inicio : ", SwingConstants.RIGHT, this, 15, 315, 130, 35);
         this.dateChooserStartDate = new DateChooser(SwingConstants.CENTER, this, 150, 315, 215, 35);
 
-        this.lblScheduling = new Label("Planificación : ", SwingConstants.RIGHT, this, 15, 365, 130, 35);
+        this.lblTime = new Label("Horario Inicio : ", SwingConstants.RIGHT, this, 15, 365, 130, 35);
+        this.sprTime = new SpinnerTime(this, SwingConstants.CENTER, 150, 365, 215, 35);
+
+        this.lblScheduling = new Label("Planificación : ", SwingConstants.RIGHT, this, 15, 415, 130, 35);
         this.btgScheduling = new ButtonGroup();
-        this.rdbScheOnce = new RadioButton("Una vez", "one", btgScheduling, SwingConstants.RIGHT, this, 150, 365, 85, 35);
-        this.rdbScheDaily = new RadioButton("Diario", "daily", btgScheduling, HEIGHT, this, 235, 365, 70, 35);
-        this.rdbScheMonthly = new RadioButton("Mensual", "montly", btgScheduling, HEIGHT, this, 301, 365, 100, 35);
+        this.rdbScheOnce = new RadioButton("Una vez", "one", btgScheduling, this, 150, 415, 85, 35);
+        this.rdbScheDaily = new RadioButton("Diario", "daily", btgScheduling, this, 235, 415, 70, 35);
+        this.rdbScheMonthly = new RadioButton("Mensual", "montly", btgScheduling, this, 301, 415, 100, 35);
         this.rdbScheDaily.setSelected(true);
 
         this.txpMessage = new TextPane(StyleConstants.ALIGN_CENTER, FONT_PLAIN_15);
         this.scroll = new JScrollPane(this.txpMessage);
         this.add(this.scroll);
-        this.scroll.setBounds(20, 405, 350, 210);
+        this.scroll.setBounds(20, 455, 350, 160);
         this.repaint();
 
         this.btnStart = new Button("Iniciar", SwingConstants.CENTER, FONT_BOLD_14, this, 20, 620, 170, 35);
@@ -128,10 +138,6 @@ public class BackUpView extends Frame {
         return fchSavePath;
     }
 
-    public DateChooser getDateChooserStartDate() {
-        return dateChooserStartDate;
-    }
-
     public TextPane getTxpMessage() {
         return txpMessage;
     }
@@ -148,4 +154,11 @@ public class BackUpView extends Frame {
         return btgScheduling;
     }
 
+    public DateChooser getDateChooserStartDate() {
+        return dateChooserStartDate;
+    }
+
+    public SpinnerTime getSprTime() {
+        return sprTime;
+    }
 }

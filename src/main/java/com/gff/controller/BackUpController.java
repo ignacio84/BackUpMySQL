@@ -2,6 +2,7 @@ package com.gff.controller;
 
 import com.gff.model.datasource.ConexionMySql;
 import com.gff.model.entity.Configuracion;
+import com.gff.util.BackUp;
 import com.gff.util.WindowsSystemTray;
 import com.gff.view.BackUpView;
 import java.awt.Frame;
@@ -12,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -26,6 +28,8 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
     private BackUpView vBackUp;
     private WindowsSystemTray tray;
     private ConexionMySql connection;
+    private BackUp backUp;
+    private Configuracion config;
 
     private final String E_SERVER = "Favor de ingresar la dirección del servidor.";
     private final String E_NAME_DB = "Favor de ingresar nombre de BD.";
@@ -34,12 +38,10 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
     private final String E_DUMP_PATH = "Favor de seleccionar mysql dump.";
     private final String E_SAVE_PATH = "Favor de seleccionar directorio.";
     private final String E_DATE_START = "Favor de seleccionar fecha de inicio.";
+    private final String E_TIME_START = "Favor de seleccionar hora de inicio.";
 
     public BackUpController() {
         this.vBackUp = new BackUpView("BackUpMySQL", 400, 700);
-        this.vBackUp.getDateChooserStartDate().setMinSelectableDate(Date.from(LocalDate.now().atStartOfDay()
-                .atZone(ZoneId.systemDefault())
-                .toInstant()));
         this.tray = new WindowsSystemTray(vBackUp);
 //        this.enableControls();
         this.addListeners();
@@ -54,6 +56,9 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
         this.vBackUp.getTxtSavePath().addMouseListener(this);
         this.vBackUp.getBtnStart().addActionListener(this);
         this.vBackUp.getBtnStop().addActionListener(this);
+        this.vBackUp.getDateChooserStartDate().setMinSelectableDate(Date.from(LocalDate.now().atStartOfDay()
+                .atZone(ZoneId.systemDefault())
+                .toInstant()));
     }
 
     @Override
@@ -104,7 +109,7 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
     }
 
     private void start() {
-        Configuracion config;
+
         if (this.vBackUp.getTxtServerAdress().getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this.vBackUp, E_SERVER, "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -131,15 +136,25 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
             JOptionPane.showMessageDialog(this.vBackUp, E_SAVE_PATH, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        config = new Configuracion();
-        config.setServerAdress(this.vBackUp.getTxtServerAdress().getText().trim());
-        config.setNameBD(this.vBackUp.getTxtNameBD().getText().trim());
-        config.setUserBD(this.vBackUp.getTxtUserBD().getText().trim());
-        config.setPasswordBD(this.vBackUp.getPwdPassBD().getText().trim());
-        config.setMysqlDump(this.vBackUp.getTxtDumpPath().getText().trim());
-        config.setSavePath(this.vBackUp.getTxtSavePath().getText().trim());
-        config.setStartDate(this.vBackUp.getDateChooserStartDate().getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-        config.setScheduling(this.vBackUp.getBtgScheduling().getSelection().getActionCommand());
+        if (this.vBackUp.getDateChooserStartDate() == null) {
+            JOptionPane.showMessageDialog(this.vBackUp, E_DATE_START, "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (this.vBackUp.getSprTime() == null) {
+            JOptionPane.showMessageDialog(this.vBackUp, E_TIME_START, "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        this.config = new Configuracion();
+        this.config.setServerAdress(this.vBackUp.getTxtServerAdress().getText().trim());
+        this.config.setNameBD(this.vBackUp.getTxtNameBD().getText().trim());
+        this.config.setUserBD(this.vBackUp.getTxtUserBD().getText().trim());
+        this.config.setPasswordBD(this.vBackUp.getPwdPassBD().getText().trim());
+        this.config.setMysqlDump(this.vBackUp.getTxtDumpPath().getText().trim());
+        this.config.setSavePath(this.vBackUp.getTxtSavePath().getText().trim());
+        this.config.setStartDate(this.vBackUp.getDateChooserStartDate().getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        this.config.setScheduling(this.vBackUp.getBtgScheduling().getSelection().getActionCommand());
+        this.config.setStarTime(this.vBackUp.getSprTime().toString());
         this.connection.setConfig(config);
         this.connection();
     }
@@ -150,8 +165,20 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
             if (conn != null && !conn.isClosed()) {
                 JOptionPane.showMessageDialog(this.vBackUp, "Conexión OK", "Error", JOptionPane.ERROR_MESSAGE);
                 this.connection.close(conn);
+                if (conn.isClosed()) {
+                    this.backUp = new BackUp(this.config);
+                    this.execute();
+                }
             }
         } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this.vBackUp, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void execute() {
+        try {
+            this.backUp.execute();
+        } catch (IOException | InterruptedException ex) {
             JOptionPane.showMessageDialog(this.vBackUp, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
