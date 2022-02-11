@@ -1,8 +1,11 @@
 package com.gff.util;
 
 import com.gff.model.entity.Configuracion;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class BackUp {
 
@@ -12,46 +15,51 @@ public class BackUp {
     public BackUp(Configuracion config) {
         this.config = config;
         if (this.config != null) {
-            this.createParams();
+            this.loadParams();
         }
     }
 
-    private void createParams() {
+    private void loadParams() {
         this.parameters = this.config.getMysqlDump()
+                .concat(" -h ")
+                .concat(this.config.getServerAdress())
                 .concat(" -u ")
                 .concat(this.config.getUserBD())
-                .concat(" -p ")
+                .concat(" -p")
                 .concat(this.config.getPasswordBD())
-                .concat(" --databases ")
+                .concat(" --routines ")
                 .concat(this.config.getNameBD())
-                .concat(" --triggers --single-transaction --routines ")
-                .concat(" --result-file=dump.sql");
-        System.out.println(this.parameters);
+                .concat(" -r ")
+                .concat(this.config.getSavePath())
+                .concat(File.separator)
+                .concat(config.getNameBD())
+                .concat("_")
+                .concat(this.buildFileName())
+                .concat(".sql");
     }
 
+    //EXECUTA RESPALDO
     public void execute() throws IOException, InterruptedException {
+        int status;
         Process exec = Runtime
                 .getRuntime()
                 .exec(this.parameters);
-        //Wait for the command to complete, and check if the exit value was 0 (success)
-        if (exec.waitFor() == 0) {
-            //normally terminated, a way to read the output
-            InputStream inputStream = exec.getInputStream();
-            byte[] buffer = new byte[inputStream.available()];
-            inputStream.read(buffer);
-
-            String str = new String(buffer);
-            System.out.println(str);
+        status = exec.waitFor();
+        if (status == 0) {
+//              RESPALDO GENERADO CORRECTAMENTE
         } else {
-            // abnormally terminated, there was some problem
-            //a way to read the error during the execution of the command
+//            ERROR AL GENERAR EL RESPALDO
             InputStream errorStream = exec.getErrorStream();
             byte[] buffer = new byte[errorStream.available()];
             errorStream.read(buffer);
-
             String str = new String(buffer);
-            System.out.println(str);
             throw new IOException(str);
         }
+    }
+
+    private String buildFileName() {
+        LocalDateTime current = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        return current.format(formatter).toString();
     }
 }

@@ -3,6 +3,7 @@ package com.gff.controller;
 import com.gff.model.datasource.ConexionMySql;
 import com.gff.model.entity.Configuracion;
 import com.gff.util.BackUp;
+import com.gff.util.BackUpJob;
 import com.gff.util.WindowsSystemTray;
 import com.gff.view.BackUpView;
 import java.awt.Frame;
@@ -13,7 +14,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -22,6 +22,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SimpleScheduleBuilder;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.impl.StdSchedulerFactory;
 
 public class BackUpController implements WindowStateListener, MouseListener, ActionListener {
 
@@ -136,7 +144,7 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
             JOptionPane.showMessageDialog(this.vBackUp, E_SAVE_PATH, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        if (this.vBackUp.getDateChooserStartDate() == null) {
+        if (this.vBackUp.getDateChooserStartDate().getDate() == null) {
             JOptionPane.showMessageDialog(this.vBackUp, E_DATE_START, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -154,12 +162,12 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
         this.config.setSavePath(this.vBackUp.getTxtSavePath().getText().trim());
         this.config.setStartDate(this.vBackUp.getDateChooserStartDate().getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
         this.config.setScheduling(this.vBackUp.getBtgScheduling().getSelection().getActionCommand());
-        this.config.setStarTime(this.vBackUp.getSprTime().toString());
+        this.config.setStarTime(this.vBackUp.getSprTime().getValue().toString());
         this.connection.setConfig(config);
-        this.connection();
+        this.connectionTest();
     }
 
-    private void connection() {
+    private void connectionTest() {
         try {
             java.sql.Connection conn = this.connection.getConnection();
             if (conn != null && !conn.isClosed()) {
@@ -167,7 +175,8 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
                 this.connection.close(conn);
                 if (conn.isClosed()) {
                     this.backUp = new BackUp(this.config);
-                    this.execute();
+//                    this.executeBackUp();
+                    Scheduling();
                 }
             }
         } catch (SQLException ex) {
@@ -175,11 +184,38 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
         }
     }
 
-    private void execute() {
+//    private void executeBackUp() {
+//        try {
+//            this.backUp.execute();
+//        } catch (IOException | InterruptedException ex) {
+//            JOptionPane.showMessageDialog(this.vBackUp, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+//        }
+//    }
+    private void Scheduling() {
+        BackUpJob back = new BackUpJob();
+        back.setConfig(config);
         try {
-            this.backUp.execute();
-        } catch (IOException | InterruptedException ex) {
-            JOptionPane.showMessageDialog(this.vBackUp, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JobDetail job = JobBuilder.newJob(BackUpJob.class)
+                    .withIdentity("backUp")
+                    .build();
+
+//            job.getJobDataMap().put("config", this.config);//SE ENVIA OBJETO AL A LA IMPLEMENTACION DEL LA INTERFACE JOB
+            
+            // Crear instancia de Trigger
+            Trigger trigger = TriggerBuilder
+                    .newTrigger()
+                    .withIdentity("backUpTrigger", "group1")
+                    .withSchedule(
+                            SimpleScheduleBuilder.simpleSchedule()
+                                    .withIntervalInSeconds(5).repeatForever())
+                    .build();
+
+            // Crea una instancia de Scheduler
+            Scheduler scheduler = new StdSchedulerFactory().getScheduler();
+            scheduler.start();
+            scheduler.scheduleJob(job, trigger);// enlazar JobDetail y Trigger
+        } catch (SchedulerException ex) {
+            Logger.getLogger(BackUpController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
