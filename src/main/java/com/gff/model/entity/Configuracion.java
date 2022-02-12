@@ -1,6 +1,11 @@
 package com.gff.model.entity;
 
+import com.gff.view.gui.TextPane;
+import java.io.File;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class Configuracion {
 
     private String serverAdress;
@@ -9,9 +14,12 @@ public class Configuracion {
     private String passwordBD;
     private String mysqlDump;
     private String savePath;
+    private String nameFile;
     private LocalDate startDate;
     private String scheduling;
-    private String starTime;
+    private String starMinute;
+    private String starHour;
+    private TextPane textpane;
 
     public String getNameBD() {
         return nameBD;
@@ -46,11 +54,18 @@ public class Configuracion {
     }
 
     public String getSavePath() {
-        return savePath;
+        return savePath + this.nameFile;
+    }
+
+    public void buildName() {
+        this.nameFile = this.getNameBD()
+                .concat("_")
+                .concat(this.buildFileName())
+                .concat(".sql");
     }
 
     public void setSavePath(String savePath) {
-        this.savePath = savePath;
+        this.savePath = savePath.concat(File.separator);
     }
 
     public LocalDate getStartDate() {
@@ -77,16 +92,38 @@ public class Configuracion {
         this.serverAdress = serverAdress;
     }
 
-    public String getStarTime() {
-        return starTime;
+    public String getStarMinute() {
+        return starMinute;
     }
 
-    public void setStarTime(String starTime) {
-        this.starTime = starTime;
+    public void setStarMinute(String starMinute) {
+        this.starMinute = starMinute;
+    }
+
+    public String getStarHour() {
+        return starHour;
+    }
+
+    public void setStarHour(String starHour) {
+        this.starHour = starHour;
+    }
+
+    public TextPane getTextpane() {
+        return textpane;
+    }
+
+    public void setTextpane(TextPane textpane) {
+        this.textpane = textpane;
+    }
+
+    private String buildFileName() {
+        LocalDateTime current = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        return current.format(formatter).toString();
     }
 
     @Override
     public String toString() {
-        return "Configuracion{" + "serverAdress=" + serverAdress + ", nameBD=" + nameBD + ", userBD=" + userBD + ", passwordBD=" + passwordBD + ", mysqlDump=" + mysqlDump + ", savePath=" + savePath + ", startDate=" + startDate + ", scheduling=" + scheduling + ", starTime=" + starTime + '}';
+        return "Configuracion{" + "serverAdress=" + serverAdress + ", nameBD=" + nameBD + ", userBD=" + userBD + ", passwordBD=" + passwordBD + ", mysqlDump=" + mysqlDump + ", savePath=" + savePath + ", nameFile=" + nameFile + ", startDate=" + startDate + ", scheduling=" + scheduling + ", starMinute=" + starMinute + ", starHour=" + starHour + ", textpane=" + textpane + '}';
     }
 }

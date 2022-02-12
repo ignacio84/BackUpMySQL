@@ -7,16 +7,17 @@ import javax.swing.JFrame;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
+import javax.swing.text.DateFormatter;
 
 public class SpinnerTime extends JSpinner {
-    
+
     private JFrame frame;
     private Integer x;
     private Integer y;
     private Integer w;
     private Integer h;
     private Integer align;
-    
+
     public SpinnerTime(JFrame frame, Integer align, Integer x, Integer y, Integer w, Integer h) {
         this.x = x;
         this.y = y;
@@ -26,7 +27,7 @@ public class SpinnerTime extends JSpinner {
         this.frame = frame;
         this.initComponents();
     }
-    
+
     private void initComponents() {
         if (this.frame != null) {
             this.frame.add(this);
@@ -34,7 +35,10 @@ public class SpinnerTime extends JSpinner {
         if (x != null && y != null && w != null && h != null) {
             this.setBounds(x, y, w, h);
         }
-        
+        this.inputTime();
+    }
+
+    private void inputTime() {
         SpinnerDateModel model = new SpinnerDateModel();
         model.setCalendarField(Calendar.HOUR_OF_DAY);//obtiene la hora actual
         this.setModel(model);

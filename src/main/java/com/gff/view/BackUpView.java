@@ -2,14 +2,10 @@ package com.gff.view;
 
 import static com.gff.util.Enviroment.*;
 import com.gff.view.gui.*;
-import java.util.Calendar;
 import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerDateModel;
 import javax.swing.SwingConstants;
-import javax.swing.text.DateFormatter;
 import javax.swing.text.StyleConstants;
 
 public class BackUpView extends Frame {
@@ -96,7 +92,10 @@ public class BackUpView extends Frame {
         this.rdbScheDaily.setSelected(true);
 
         this.txpMessage = new TextPane(StyleConstants.ALIGN_CENTER, FONT_PLAIN_15);
+        this.txpMessage.setEditable(false);
+//        this.scroll = new JScrollPane(this.txpMessage, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         this.scroll = new JScrollPane(this.txpMessage);
+
         this.add(this.scroll);
         this.scroll.setBounds(20, 455, 350, 160);
         this.repaint();
@@ -160,5 +159,35 @@ public class BackUpView extends Frame {
 
     public SpinnerTime getSprTime() {
         return sprTime;
+    }
+
+    public void enabledForm() {
+        this.txtServerAdress.setEnabled(true);
+        this.txtNameBD.setEnabled(true);
+        this.txtUserBD.setEnabled(true);
+        this.pwdPassBD.setEnabled(true);
+        this.txtDumpPath.setEnabled(true);
+        this.txtSavePath.setEnabled(true);
+        this.dateChooserStartDate.setEnabled(true);
+        this.sprTime.setEnabled(true);
+        this.btnStart.setEnabled(true);
+        this.rdbScheDaily.setEnabled(true);
+        this.rdbScheMonthly.setEnabled(true);
+        this.rdbScheOnce.setEnabled(true);
+    }
+
+    public void disabledForm() {
+        this.txtServerAdress.setEnabled(false);
+        this.txtNameBD.setEnabled(false);
+        this.txtUserBD.setEnabled(false);
+        this.pwdPassBD.setEnabled(false);
+        this.txtDumpPath.setEnabled(false);
+        this.txtSavePath.setEnabled(false);
+        this.dateChooserStartDate.setEnabled(false);
+        this.sprTime.setEnabled(false);
+        this.btnStart.setEnabled(false);
+        this.rdbScheDaily.setEnabled(true);
+        this.rdbScheMonthly.setEnabled(true);
+        this.rdbScheOnce.setEnabled(true);
     }
 }

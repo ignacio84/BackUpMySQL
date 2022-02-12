@@ -2,10 +2,10 @@ package com.gff.controller;
 
 import com.gff.model.datasource.ConexionMySql;
 import com.gff.model.entity.Configuracion;
-import com.gff.util.BackUp;
-import com.gff.util.BackUpJob;
+import com.gff.util.QuartzScheduling;
 import com.gff.util.WindowsSystemTray;
 import com.gff.view.BackUpView;
+import com.gff.view.gui.SpinnerTime;
 import java.awt.Frame;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
@@ -16,28 +16,22 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SimpleScheduleBuilder;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import org.quartz.impl.StdSchedulerFactory;
 
 public class BackUpController implements WindowStateListener, MouseListener, ActionListener {
 
     private BackUpView vBackUp;
     private WindowsSystemTray tray;
     private ConexionMySql connection;
-    private BackUp backUp;
     private Configuracion config;
+    private QuartzScheduling scheduling;
 
     private final String E_SERVER = "Favor de ingresar la dirección del servidor.";
     private final String E_NAME_DB = "Favor de ingresar nombre de BD.";
@@ -51,11 +45,10 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
     public BackUpController() {
         this.vBackUp = new BackUpView("BackUpMySQL", 400, 700);
         this.tray = new WindowsSystemTray(vBackUp);
-//        this.enableControls();
         this.addListeners();
         this.connection = new ConexionMySql();
+        this.scheduling = new QuartzScheduling();
         this.vBackUp.setVisible(true);
-
     }
 
     private void addListeners() {
@@ -84,7 +77,6 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
         if (e.getSource().equals(vBackUp.getTxtDumpPath())) {
             if (vBackUp.getFchDumpPath().showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                 this.vBackUp.getTxtDumpPath().setText(vBackUp.getFchDumpPath().getSelectedFile().getAbsolutePath());
-//                vBackUp.getFchDump().setSelectedFile(new File(""));
             }
             return;
         }
@@ -113,11 +105,17 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(vBackUp.getBtnStart())) {
             this.start();
+            return;
+        }
+        try {
+            this.scheduling.stopScheduling();
+            this.vBackUp.enabledForm();
+        } catch (SchedulerException ex) {
+            JOptionPane.showMessageDialog(this.vBackUp, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void start() {
-
         if (this.vBackUp.getTxtServerAdress().getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this.vBackUp, E_SERVER, "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -130,12 +128,10 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
             JOptionPane.showMessageDialog(this.vBackUp, E_USER_DB, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
         if (this.vBackUp.getPwdPassBD().getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this.vBackUp, E_PASS_DB, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
         if (this.vBackUp.getTxtDumpPath().getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this.vBackUp, E_DUMP_PATH, "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -152,7 +148,6 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
             JOptionPane.showMessageDialog(this.vBackUp, E_TIME_START, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
         this.config = new Configuracion();
         this.config.setServerAdress(this.vBackUp.getTxtServerAdress().getText().trim());
         this.config.setNameBD(this.vBackUp.getTxtNameBD().getText().trim());
@@ -162,61 +157,31 @@ public class BackUpController implements WindowStateListener, MouseListener, Act
         this.config.setSavePath(this.vBackUp.getTxtSavePath().getText().trim());
         this.config.setStartDate(this.vBackUp.getDateChooserStartDate().getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
         this.config.setScheduling(this.vBackUp.getBtgScheduling().getSelection().getActionCommand());
-        this.config.setStarTime(this.vBackUp.getSprTime().getValue().toString());
+        this.config.setTextpane(this.vBackUp.getTxpMessage());
+        LocalDateTime timeStart = ((Date) this.vBackUp.getSprTime().getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        this.config.setStarMinute(String.valueOf(timeStart.getMinute()));
+        this.config.setStarMinute(String.valueOf(timeStart.getHour()));
         this.connection.setConfig(config);
-        this.connectionTest();
+        this.connectionDB();
     }
 
-    private void connectionTest() {
+    private void connectionDB() {
         try {
             java.sql.Connection conn = this.connection.getConnection();
             if (conn != null && !conn.isClosed()) {
-                JOptionPane.showMessageDialog(this.vBackUp, "Conexión OK", "Error", JOptionPane.ERROR_MESSAGE);
                 this.connection.close(conn);
                 if (conn.isClosed()) {
-                    this.backUp = new BackUp(this.config);
-//                    this.executeBackUp();
-                    Scheduling();
+                    this.startScheduling();
+                    this.vBackUp.disabledForm();
                 }
             }
-        } catch (SQLException ex) {
+        } catch (SQLException | SchedulerException ex) {
             JOptionPane.showMessageDialog(this.vBackUp, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-//    private void executeBackUp() {
-//        try {
-//            this.backUp.execute();
-//        } catch (IOException | InterruptedException ex) {
-//            JOptionPane.showMessageDialog(this.vBackUp, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-//        }
-//    }
-    private void Scheduling() {
-        BackUpJob back = new BackUpJob();
-        back.setConfig(config);
-        try {
-            JobDetail job = JobBuilder.newJob(BackUpJob.class)
-                    .withIdentity("backUp")
-                    .build();
-
-//            job.getJobDataMap().put("config", this.config);//SE ENVIA OBJETO AL A LA IMPLEMENTACION DEL LA INTERFACE JOB
-            
-            // Crear instancia de Trigger
-            Trigger trigger = TriggerBuilder
-                    .newTrigger()
-                    .withIdentity("backUpTrigger", "group1")
-                    .withSchedule(
-                            SimpleScheduleBuilder.simpleSchedule()
-                                    .withIntervalInSeconds(5).repeatForever())
-                    .build();
-
-            // Crea una instancia de Scheduler
-            Scheduler scheduler = new StdSchedulerFactory().getScheduler();
-            scheduler.start();
-            scheduler.scheduleJob(job, trigger);// enlazar JobDetail y Trigger
-        } catch (SchedulerException ex) {
-            Logger.getLogger(BackUpController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    private void startScheduling() throws SchedulerException {
+        this.scheduling.setConfig(config);
+        this.scheduling.startScheduling();
     }
-
 }

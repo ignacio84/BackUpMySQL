@@ -3,7 +3,6 @@ package com.gff.view.gui;
 import static com.gff.backupmysql.BackUpMySQL.IMG;
 import static com.gff.util.Enviroment.*;
 import java.awt.Window;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 
 public class Frame extends JFrame {
@@ -31,7 +30,7 @@ public class Frame extends JFrame {
         this.setLayout(null);
         this.setSize(this.height, this.width);
         this.setType(Window.Type.NORMAL);
-        this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);//PROPIEDAD PARA QUE CUENDO CIERREN LA VENTANA SE TEMINE LA APLICACION DE EJECUTAR
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//PROPIEDAD PARA QUE CUENDO CIERREN LA VENTANA SE TEMINE LA APLICACION DE EJECUTAR
         this.setLocationRelativeTo(null);
         this.setExtendedState(this.maximezed);
         this.setIconImage(IMG.loadBufferImage(APP_LOGO));

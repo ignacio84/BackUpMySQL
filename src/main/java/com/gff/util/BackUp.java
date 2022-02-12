@@ -1,22 +1,16 @@
 package com.gff.util;
 
 import com.gff.model.entity.Configuracion;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class BackUp {
 
     private Configuracion config;
     private String parameters;
 
-    public BackUp(Configuracion config) {
+    public void setConfig(Configuracion config) {
         this.config = config;
-        if (this.config != null) {
-            this.loadParams();
-        }
     }
 
     private void loadParams() {
@@ -30,16 +24,12 @@ public class BackUp {
                 .concat(" --routines ")
                 .concat(this.config.getNameBD())
                 .concat(" -r ")
-                .concat(this.config.getSavePath())
-                .concat(File.separator)
-                .concat(config.getNameBD())
-                .concat("_")
-                .concat(this.buildFileName())
-                .concat(".sql");
+                .concat(this.config.getSavePath());
     }
 
     //EXECUTA RESPALDO
-    public void execute() throws IOException, InterruptedException {
+    public void executeBackUp() throws IOException, InterruptedException {
+        this.loadParams();
         int status;
         Process exec = Runtime
                 .getRuntime()
@@ -57,9 +47,4 @@ public class BackUp {
         }
     }
 
-    private String buildFileName() {
-        LocalDateTime current = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-        return current.format(formatter).toString();
-    }
 }
