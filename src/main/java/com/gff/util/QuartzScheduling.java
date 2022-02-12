@@ -78,13 +78,14 @@ public class QuartzScheduling {
     }
 
     private void buidCron() {
-        
-    
         if (this.config.getScheduling().equals("one")) {
-            
+            this.cron = "0 "
+                    .concat(this.config.getStarMinute())
+                    .concat(" ")
+                    .concat(this.config.getStarMinute())
+                    .concat(" * * ?");
         }
         if (this.config.getScheduling().equals("daily")) {
-
         }
         if (this.config.getScheduling().equals("montly")) {
 
